@@ -6,30 +6,65 @@
 //
 
 import XCTest
+@testable import Testing
 
-final class TestingTests: XCTestCase {
-
+class TestingTests: XCTestCase {
+    
+    var fieldValidator: FieldValidator!
+    
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        
+        fieldValidator = FieldValidatorImpl()
+        
     }
-
+    
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        fieldValidator = nil
+        
     }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+    
+    func testValidatorCorrectWithValues() throws {
+        
+        //Given
+        let loginTf = UITextField()
+        let passwordTf = UITextField()
+        
+        let expectedResult = false
+        var validateResult: Bool
+        
+        //When
+        validateResult =
+        fieldValidator.validateLoginTextField(loginTF: loginTf, passwordTF: passwordTf)
+        
+        //Then
+        XCTAssertEqual(expectedResult, validateResult)
+        
+        
     }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        measure {
-            // Put the code you want to measure the time of here.
+    func testAsyncValidatorCorrectWithValues() throws {
+        //Given
+        let loginTf = UITextField()
+        let passwordTf = UITextField()
+        let expectedResult = false
+        var validateResult: Bool?
+        let validExpectation = expectation(description: "Expectation in" + #function)
+        
+        
+        //When
+        
+        fieldValidator.asyncValidateLoginTextFields(loginTF: loginTf, passwordTF: passwordTf) { (isValid) in
+            
+            validateResult = isValid
+            
+            validExpectation.fulfill()
+        }
+        
+        //Then
+        waitForExpectations(timeout: 2.0) { (error) in
+            if error != nil {
+                XCTFail()
+            }
+            
         }
     }
-
 }
